@@ -13,18 +13,18 @@
 #define SPAWN_TIME 15000
 
 typedef struct _Character {
-    int position[2], size[2];	//position[0]ÀÌ xÁÂÇ¥, position[1]ÀÌ yÁÂÇ¥ ,  size[0]ÀÌ size_x, size[1]ÀÌ size_y 
-    float accel[2], flyTime;	//accel[0]: ´ë½¬¿ë °¡¼Óµµ  accel[1]: Á¡ÇÁ¿ë °¡¼Óµµ  and flotation time
-    bool direction;				//true=¿À¸¥ÂÊ¹æÇâ , false=¿ŞÂÊ¹æÇâ 
+    int position[2], size[2];	//position[0]ì´ xì¢Œí‘œ, position[1]ì´ yì¢Œí‘œ ,  size[0]ì´ size_x, size[1]ì´ size_y 
+    float accel[2], flyTime;	//accel[0]: ëŒ€ì‰¬ìš© ê°€ì†ë„  accel[1]: ì í”„ìš© ê°€ì†ë„  and flotation time
+    bool direction;				//true=ì˜¤ë¥¸ìª½ë°©í–¥ , false=ì™¼ìª½ë°©í–¥ 
     //status 
     char name[16];
-    int lv, exp[2], score, hp[2], mp[2];	//[0]=ÃÖ´ë°ª , [1]=ÇöÀç°ª 
+    int lv, exp[2], score, hp[2], mp[2];	//[0]=ìµœëŒ€ê°’ , [1]=í˜„ì¬ê°’ 
     int power, weapon;
     //animation control
-    bool attack;				//Å°º¸µå z°¡ ´­¸®¸é attack = TRUE, ¾Æ´Ï¸é FALSE 
-    bool skill_attack1;			//Å°º¸µå x°¡ ´­¸®¸é ·¹ÀÌÀú ½ºÅ³  
-	bool skill_attack2;			//Å°º¸µå a°¡ ´­¸®¸é °­¾ÆÁö ½ºÅ³  
-	int tick[4];				//tick : µô·¹ÀÌ(½Ã°£ÃøÁ¤) º¯¼ö  [0]: ÇÇÁ¨ tick [1]: °ø°İ tick, [2] : ´ë½¬ tick, [3] : ÇÇ°İ½Ã ¹«Àû tick
+    bool attack;				//í‚¤ë³´ë“œ zê°€ ëˆŒë¦¬ë©´ attack = TRUE, ì•„ë‹ˆë©´ FALSE 
+    bool skill_attack1;			//í‚¤ë³´ë“œ xê°€ ëˆŒë¦¬ë©´ ë ˆì´ì € ìŠ¤í‚¬  
+	bool skill_attack2;			//í‚¤ë³´ë“œ aê°€ ëˆŒë¦¬ë©´ ê°•ì•„ì§€ ìŠ¤í‚¬  
+	int tick[4];				//tick : ë”œë ˆì´(ì‹œê°„ì¸¡ì •) ë³€ìˆ˜  [0]: í”¼ì   tick [1]: ê³µê²© tick, [2] : ëŒ€ì‰¬ tick, [3] : í”¼ê²©ì‹œ ë¬´ì  tick
 }Character;
 
 typedef struct _Object {	//enemies, projectiles, particles, etc.
@@ -34,7 +34,7 @@ typedef struct _Object {	//enemies, projectiles, particles, etc.
 	
     int kind;	//1~99: items, 100~199: enemies, 200~: projectiles, particles
     int hp[2], exp;	//hp: this value is used randomly for item or particle object
-    int isJumping;	//½½¶óÀÓÀÌ Á¡ÇÁÁßÀÌ¶ó¸é TRUE (Á¡ÇÁ¶Û¶§ ´Ù¸£°Ô ±×·ÁÁÖ±â À§ÇÔ)
+    int isJumping;	//ìŠ¬ë¼ì„ì´ ì í”„ì¤‘ì´ë¼ë©´ TRUE (ì í”„ë›¸ë•Œ ë‹¤ë¥´ê²Œ ê·¸ë ¤ì£¼ê¸° ìœ„í•¨)
     int tick[4];	//0: hpshow time(enemy) or active time(projecticles, particles)
 }Object;
 
@@ -42,87 +42,87 @@ Character character = {{MAP_X_MAX / 2, MAP_Y_MAX / 2}, {3, 3}, {0, 0}, 0, TRUE, 
 Object **objects;
 
 int tick = 0;							//tick 
-int spon_tick = 0;						//¸ó½ºÅÍ ¸®Á¨¿ë tick 
-int boss_tick1 = 0;						//°Å¹Ìº¸½º ÇÑ¹ø¸¸ ¼ÒÈ¯µÇ°Ô ÇÒ tick 
-int boss_tick2 = 0; 					//¾Æ¼ö¶óº¸½º tick 
-int boss_skill_tick1 = 0;				//°Å¹Ìº¸½º ½ºÅ³ tick 
-int boss_skill_tick2 = 0;				//¾Æ¼ö¶óº¸½º ½ºÅ³ tick
+int spon_tick = 0;						//ëª¬ìŠ¤í„° ë¦¬ì  ìš© tick 
+int boss_tick1 = 0;						//ê±°ë¯¸ë³´ìŠ¤ í•œë²ˆë§Œ ì†Œí™˜ë˜ê²Œ í•  tick 
+int boss_tick2 = 0; 					//ì•„ìˆ˜ë¼ë³´ìŠ¤ tick 
+int boss_skill_tick1 = 0;				//ê±°ë¯¸ë³´ìŠ¤ ìŠ¤í‚¬ tick 
+int boss_skill_tick2 = 0;				//ì•„ìˆ˜ë¼ë³´ìŠ¤ ìŠ¤í‚¬ tick
 int clear_boss = 0;
-char figure_floor[MAP_X_MAX];			//¶¥¸ğ¾ç ¹è¿­ 
-char mapData[MAP_X_MAX * MAP_Y_MAX];	//ÄÜ¼ÖÃ¢ Å©±âÀÇ ¹è¿­ 
+char figure_floor[MAP_X_MAX];			//ë•…ëª¨ì–‘ ë°°ì—´ 
+char mapData[MAP_X_MAX * MAP_Y_MAX];	//ì½˜ì†”ì°½ í¬ê¸°ì˜ ë°°ì—´ 
 
-//Ä³¸¯ÅÍ ¸ğ¾ç ¹è¿­ (3*3) 
+//ìºë¦­í„° ëª¨ì–‘ ë°°ì—´ (3*3) 
 char figure_character[10] = " 0  | a^a";
 
-//µé°íÀÖ´Â ¹«±â ¸ğ¾ç 
+//ë“¤ê³ ìˆëŠ” ë¬´ê¸° ëª¨ì–‘ 
 char figure_weapon[2][2][4] = 
 {{"---", "<=+"},
  {"---", "+=>"}};
 
-//»óÅÂÃ¢ ¹Ú½ºÀÇ ¹«±â¸ğ¾ç 
+//ìƒíƒœì°½ ë°•ìŠ¤ì˜ ë¬´ê¸°ëª¨ì–‘ 
 const char figure_invenWeapon[2][11] = {"   /   /  ","  |   \"+\" "};  
 
-//¸ó½ºÅÍ ¸ğ¾ç 
+//ëª¬ìŠ¤í„° ëª¨ì–‘ 
 char figure_enemy1[2][13] = {" __ (**)----", " __ [xx]\'--\'"};
-//º¸½º °Å¹Ì ¸ğ¾ç 
+//ë³´ìŠ¤ ê±°ë¯¸ ëª¨ì–‘ 
 char figure_spider[] ="|                | |      ##      |  --    {  }    --    |  {    }  |      |-{  --  }-|        { ---- }     |  --{ ---- }--  | -/  {  --  }  \\-     / {    } \\       / { 0000 } \\     -   { 00 }   -   |  /{      }\\  | |  |  \\()()/  |  ||  |   ||||   |  || /    \\/\\/    \\ || |            | |  |            |    |            |  ";
-//º¸½º ¾Æ¼ö¶ó ¸ğ¾ç 
+//ë³´ìŠ¤ ì•„ìˆ˜ë¼ ëª¨ì–‘ 
 char figure_asura[] ={"   ^    |   ------   |    ^     / |    | |  || =| |    | |    |#|    || ==||=  ||    |#|    |#|    ||=()||() ||    |#|    |#|     |   ||   |     |#|    |#|    | |  || =| |    |#|    |#|   |  | ==== |  |   |#|    |#|   |  |= ||  |  |   |#|    |#|     | |    | |     |#|  ------   |   ----   |   ------ |==|    | | |||| | |    |==|  |==----| |  ||||  | |----==|  |=    | |  -=||=-  | |    =|  |----| ---|==||==|--- |----|   ====|    |==||==|    |====    ^   |    |==||==|    |   ^   /|    |---|--||--|---|    |)  ||   |    |------|    |   ||  ||  |    |        |    |  ||  || |   ||          ||   | ||  || |  | |          | |  | || ----  |  |   ----   |  |  ----|==|  | --  |    |  -- |   ==||==  | |    |    |    | |  ==||=  |  |   |      |   |  |  =| ===  |    |      |    |  ===       |   |        |   |            |   |        |   |            |   |        |   |            -----        -----      "};
-//°Å¹Ì º¸½º ½ºÅ³ »õ³¢°Å¹Ì »ı¼º 
+//ê±°ë¯¸ ë³´ìŠ¤ ìŠ¤í‚¬ ìƒˆë¼ê±°ë¯¸ ìƒì„± 
 char figure_spider_skill[] ={"      ---        || |   | ||   | ||00 00|| | | | | 0 0 | | || |  -----  | |  | |() ()| |   |  ||   ||  | |  | |   | |  |  | |     | |  "};
-//¾Æ¼ö¶ó ½ºÅ³ °Ë ¶³¾îÁö±â 
+//ì•„ìˆ˜ë¼ ìŠ¤í‚¬ ê²€ ë–¨ì–´ì§€ê¸° 
 char figure_sword[] ={"   =       =     #####  -------  |   |   | # |   | # |   | # |   | # |   | # |   | # |   | # |    | |      |    "};
-//ÀÎÆ®·Î
-char Main_1[111]={"   ¡á¡á¡á¡á¡á¡á¡á¡á            ¡á                ¡á¡á      ¡á           ¡á¡á¡á¡á¡á¡á¡á         ¡á¡á        ¡á\n"};
-char Main_2[111]={"                 ¡á          ¡á  ¡á            ¡á    ¡á    ¡á           ¡á          ¡á     ¡á¡á¡á¡á¡á¡á    ¡á\n"};
-char Main_3[111]={"                 ¡á        ¡á      ¡á        ¡á        ¡á  ¡á           ¡á          ¡á       ¡á    ¡á      ¡á\n"};
-char Main_4[111]={"                 ¡á      ¡á          ¡á      ¡á        ¡á  ¡á           ¡á          ¡á       ¡á    ¡á  ¡á¡á¡á\n"};
-char Main_5[111]={"       ¡á    ¡á                                ¡á    ¡á    ¡á           ¡á¡á¡á¡á¡á¡á¡á         ¡á¡á        ¡á\n"};
-char Main_6[111]={"       ¡á    ¡á        ¡á¡á¡á¡á¡á¡á¡á¡á¡á        ¡á¡á      ¡á                 ¡á                   ¡á¡á¡á¡á¡á\n"};
-char Main_7[111]={"       ¡á    ¡á                ¡á                          ¡á                 ¡á                   ¡á      ¡á\n"};
-char Main_8[111]={" ¡á¡á¡á¡á¡á¡á¡á¡á¡á¡á          ¡á          ¡á¡á¡á¡á¡á¡á¡á¡á¡á         ¡á¡á¡á¡á¡á¡á¡á¡á¡á           ¡á¡á¡á¡á¡á\n"}; 
-//°ÔÀÓ¿À¹ö
-char Gameover_1[110]={" ¡á¡á¡á        ¡á        ¡á¡á¡á¡á¡á      ¡á¡á¡á¡á     ¡á¡á¡á¡á   ¡á      ¡á  ¡á¡á¡á¡á  ¡á¡á¡á¡á   \n"};
-char Gameover_2[110]={"¡á             ¡á¡á      ¡á  ¡á  ¡á    ¡á          ¡á      ¡á   ¡á    ¡á  ¡á        ¡á     ¡á \n"};
-char Gameover_3[110]={"¡á            ¡á  ¡á    ¡á  ¡á  ¡á    ¡á¡á¡á¡á    ¡á      ¡á    ¡á  ¡á   ¡á¡á¡á¡á  ¡á¡á¡á¡á  \n"};
-char Gameover_4[110]={"¡á   ¡á¡á    ¡á¡á¡á¡á   ¡á  ¡á  ¡á    ¡á          ¡á      ¡á     ¡á¡á     ¡á        ¡á     ¡á \n"};
-char Gameover_5[110]={"  ¡á¡á  ¡á  ¡á     ¡á  ¡á  ¡á  ¡á    ¡á¡á¡á¡á     ¡á¡á¡á¡á        ¡á      ¡á¡á¡á¡á  ¡á      ¡á\n"};
-//¿£µù Å©·¹µ÷ 
-char End[9][30]={"Team Missile","ÀüºÏ´ëÇĞ±³","ITÁ¤º¸°øÇĞ°ú","Ã¢ÀÇÀûIT°øÇĞ¼³°èÀÔ¹®","201515300 Àå¿ì¼®","201912388 ¿ÀÁØÇõ","201912430 Á¶¹Î¼­","201918800 Á¤¼®Âù","Thank you"};
+//ì¸íŠ¸ë¡œ
+char Main_1[111]={"   â– â– â– â– â– â– â– â–             â–                 â– â–       â–            â– â– â– â– â– â– â–          â– â–         â– \n"};
+char Main_2[111]={"                 â–           â–   â–             â–     â–     â–            â–           â–      â– â– â– â– â– â–     â– \n"};
+char Main_3[111]={"                 â–         â–       â–         â–         â–   â–            â–           â–        â–     â–       â– \n"};
+char Main_4[111]={"                 â–       â–           â–       â–         â–   â–            â–           â–        â–     â–   â– â– â– \n"};
+char Main_5[111]={"       â–     â–                                 â–     â–     â–            â– â– â– â– â– â– â–          â– â–         â– \n"};
+char Main_6[111]={"       â–     â–         â– â– â– â– â– â– â– â– â–         â– â–       â–                  â–                    â– â– â– â– â– \n"};
+char Main_7[111]={"       â–     â–                 â–                           â–                  â–                    â–       â– \n"};
+char Main_8[111]={" â– â– â– â– â– â– â– â– â– â–           â–           â– â– â– â– â– â– â– â– â–          â– â– â– â– â– â– â– â– â–            â– â– â– â– â– \n"}; 
+//ê²Œì„ì˜¤ë²„
+char Gameover_1[110]={" â– â– â–         â–         â– â– â– â– â–       â– â– â– â–      â– â– â– â–    â–       â–   â– â– â– â–   â– â– â– â–    \n"};
+char Gameover_2[110]={"â–              â– â–       â–   â–   â–     â–           â–       â–    â–     â–   â–         â–      â–  \n"};
+char Gameover_3[110]={"â–             â–   â–     â–   â–   â–     â– â– â– â–     â–       â–     â–   â–    â– â– â– â–   â– â– â– â–   \n"};
+char Gameover_4[110]={"â–    â– â–     â– â– â– â–    â–   â–   â–     â–           â–       â–      â– â–      â–         â–      â–  \n"};
+char Gameover_5[110]={"  â– â–   â–   â–      â–   â–   â–   â–     â– â– â– â–      â– â– â– â–         â–       â– â– â– â–   â–       â– \n"};
+//ì—”ë”© í¬ë ˆë”§ 
+char End[9][30]={"Team Missile","ì „ë¶ëŒ€í•™êµ","ITì •ë³´ê³µí•™ê³¼","ì°½ì˜ì ITê³µí•™ì„¤ê³„ì…ë¬¸","201515300 ì¥ìš°ì„","201912388 ì˜¤ì¤€í˜","201912430 ì¡°ë¯¼ì„œ","201918800 ì •ì„ì°¬","Thank you"};
 
-void StartGame();	//ÃÊ±â ¼³Á¤ 
-void SetConsole();	//ÄÜ¼ÖÃ¢ ¼¼ÆÃ  
-void UpdateGame();   //°ÔÀÓÆÇÀÎ mapData ¾÷µ¥ÀÌÆ® ÈÄ Ãâ·Â(ÀüÃ¼ÀûÀÎ °ÔÀÓ ÁøÇà »óÈ² ¾÷µ¥ÀÌÆ®) 
-void ExitGame();   //objects µ¿Àû¸Ş¸ğ¸® ÇìÁ¦  
-void Draw_Figure(int x, int y, int size_x, int size_y, const char spr[]);	//(x,y)¸¦ ±âÁØÀ¸·Î size_x*size_yÅ©±â·Î spr[]À» ±×¸² 
-void Fill_Map(char str[], char ch, int max);	//str¹è¿­À» ¹®ÀÚ str_s·Î max_value¸¸Å­ Ã¤¿ò 
-void Edit_Map(int x, int y, char ch);	//(x,y)¸¦ ¹®ÀÚstr·Î º¯°æ 
-void Draw_Box(int x, int y, int size_x, int size_y);	//»óÅÂÃ¢¿¡ »óÀÚ ±×¸®´Â ÇÔ¼ö (x,y)¿¡ size_x*size_yÅ©±âÀÇ »óÀÚ ±×¸²
-void Draw_Number(int x, int y, int num);	//(x,y)¿¡  charÇüÀ¸·Î º¯È¯µÈ ¼ıÀÚ¸¦ ±×¸²
-int NumLen(int num);	//numÀÇ ÀÚ¸´¼ö¸¦ ¸®ÅÏÇÏ´Â ÇÔ¼ö (Draw_NumberÇÒ¶§ ÇÊ¿ä)
-void Control_UI();  //±â´É : ¶¥±×¸®±â, ¿ŞÂÊ»ó´Ü »óÅÂÃ¢ ±×¸®±â ¹× °»½Å
-void Control_Character();	//±â´É : Ä³¸¯ÅÍÀÇ ¿òÁ÷ÀÓ,½ºÅ³,ÇÇ°İ µî ±¸Çö  
-bool Check_Collision(int position1[], int position2[], int size1[], int size2[]);	//Ãæµ¹ Ã¼Å© ÇÔ¼ö : position1[]ÀÇ size1[]Å©±â°¡ position2[]ÀÇ size2[]Å©±â¿Í Ãæµ¹ÀÌ ³ª¸é TRUE  
-void Movement_Control(int position[], float accel[], int size[], float *flyTime);	//°¡¼Óµµ ÇÔ¼ö 
-bool Enemy_Position(int x, int size_x);   //Ä³¸¯ÅÍÀÇ À§Ä¡¿Í ¸ó½ºÅÍÀÇ À§Ä¡¸¦ ºñ±³.  Ä³¸¯ÅÍ°¡ ¿ŞÂÊ¿¡ ÀÖÀ¸¸é FALSE, ¿À¸¥ÂÊ¿¡ ÀÖÀ¸¸é TRUE 
-void Create_Object(int x, int y, int kind);      //x,yÁÂÇ¥¿¡ kind°ª¿¡ µû¶ó ¿ÀºêÁ§Æ® »ı¼º (1~99: ¾ÆÀÌÅÛ, 100~199: ¸ó½ºÅÍ, 200~299: µ¿Àü, 400~500:º¸½º 500~:º¸½º ½ºÅ³)
+void StartGame();	//ì´ˆê¸° ì„¤ì • 
+void SetConsole();	//ì½˜ì†”ì°½ ì„¸íŒ…  
+void UpdateGame();   //ê²Œì„íŒì¸ mapData ì—…ë°ì´íŠ¸ í›„ ì¶œë ¥(ì „ì²´ì ì¸ ê²Œì„ ì§„í–‰ ìƒí™© ì—…ë°ì´íŠ¸) 
+void ExitGame();   //objects ë™ì ë©”ëª¨ë¦¬ í—¤ì œ  
+void Draw_Figure(int x, int y, int size_x, int size_y, const char spr[]);	//(x,y)ë¥¼ ê¸°ì¤€ìœ¼ë¡œ size_x*size_yí¬ê¸°ë¡œ spr[]ì„ ê·¸ë¦¼ 
+void Fill_Map(char str[], char ch, int max);	//strë°°ì—´ì„ ë¬¸ì str_së¡œ max_valueë§Œí¼ ì±„ì›€ 
+void Edit_Map(int x, int y, char ch);	//(x,y)ë¥¼ ë¬¸ìstrë¡œ ë³€ê²½ 
+void Draw_Box(int x, int y, int size_x, int size_y);	//ìƒíƒœì°½ì— ìƒì ê·¸ë¦¬ëŠ” í•¨ìˆ˜ (x,y)ì— size_x*size_yí¬ê¸°ì˜ ìƒì ê·¸ë¦¼
+void Draw_Number(int x, int y, int num);	//(x,y)ì—  charí˜•ìœ¼ë¡œ ë³€í™˜ëœ ìˆ«ìë¥¼ ê·¸ë¦¼
+int NumLen(int num);	//numì˜ ìë¦¿ìˆ˜ë¥¼ ë¦¬í„´í•˜ëŠ” í•¨ìˆ˜ (Draw_Numberí• ë•Œ í•„ìš”)
+void Control_UI();  //ê¸°ëŠ¥ : ë•…ê·¸ë¦¬ê¸°, ì™¼ìª½ìƒë‹¨ ìƒíƒœì°½ ê·¸ë¦¬ê¸° ë° ê°±ì‹ 
+void Control_Character();	//ê¸°ëŠ¥ : ìºë¦­í„°ì˜ ì›€ì§ì„,ìŠ¤í‚¬,í”¼ê²© ë“± êµ¬í˜„  
+bool Check_Collision(int position1[], int position2[], int size1[], int size2[]);	//ì¶©ëŒ ì²´í¬ í•¨ìˆ˜ : position1[]ì˜ size1[]í¬ê¸°ê°€ position2[]ì˜ size2[]í¬ê¸°ì™€ ì¶©ëŒì´ ë‚˜ë©´ TRUE  
+void Movement_Control(int position[], float accel[], int size[], float *flyTime);	//ê°€ì†ë„ í•¨ìˆ˜ 
+bool Enemy_Position(int x, int size_x);   //ìºë¦­í„°ì˜ ìœ„ì¹˜ì™€ ëª¬ìŠ¤í„°ì˜ ìœ„ì¹˜ë¥¼ ë¹„êµ.  ìºë¦­í„°ê°€ ì™¼ìª½ì— ìˆìœ¼ë©´ FALSE, ì˜¤ë¥¸ìª½ì— ìˆìœ¼ë©´ TRUE 
+void Create_Object(int x, int y, int kind);      //x,yì¢Œí‘œì— kindê°’ì— ë”°ë¼ ì˜¤ë¸Œì íŠ¸ ìƒì„± (1~99: ì•„ì´í…œ, 100~199: ëª¬ìŠ¤í„°, 200~299: ë™ì „, 400~500:ë³´ìŠ¤ 500~:ë³´ìŠ¤ ìŠ¤í‚¬)
 void Control_Item(int index);
 void Control_Enemy(int index);
 void Control_Particle(int index);
-void Control_Object();   //¸ğµç ¿ÀºêÁ§Æ® ÄÁÆ®·Ñ ÇÔ¼ö
-void Remove_Object(int index);      //object[index] ¸Ş¸ğ¸® ÇØÁ¦ ÈÄ NULL·Î ÃÊ±âÈ­ : ´Ù¸¥ ¿ÀºêÁ§Æ®¸¦ À§ÇÑ Å©±â ¸¸µé±â À§ÇÔ 
-void textcolor(int foreground, int background);   //ÅØ½ºÆ®ÄÃ·¯
-//ÀÎÆ®·Î 
+void Control_Object();   //ëª¨ë“  ì˜¤ë¸Œì íŠ¸ ì»¨íŠ¸ë¡¤ í•¨ìˆ˜
+void Remove_Object(int index);      //object[index] ë©”ëª¨ë¦¬ í•´ì œ í›„ NULLë¡œ ì´ˆê¸°í™” : ë‹¤ë¥¸ ì˜¤ë¸Œì íŠ¸ë¥¼ ìœ„í•œ í¬ê¸° ë§Œë“¤ê¸° ìœ„í•¨ 
+void textcolor(int foreground, int background);   //í…ìŠ¤íŠ¸ì»¬ëŸ¬
+//ì¸íŠ¸ë¡œ 
 void PrintLogo();
 void Loading();
 void LoadEnd();
 void Intro();
-//¿£µù Å©·¹µ÷ 
+//ì—”ë”© í¬ë ˆë”§ 
 void Goto(int x,int y);
 void PrintEnding(int n,int x,int y);
 void PrintEnding2(int n,int x,int y);
 void EndingCredit();
-//°ÔÀÓ¿À¹ö È­¸é 
+//ê²Œì„ì˜¤ë²„ í™”ë©´ 
 void PrintGameover();
 
 int main()
@@ -130,17 +130,17 @@ int main()
 	Intro();
 	StartGame();
     while (TRUE) {
-      if (tick +30 < GetTickCount()) {   //30ms¿¡ ÇÑ¹ø¾¿ updategameµÇµµ·Ï ¼³Á¤   
-         tick = GetTickCount();         //ÄÄÇ»ÅÍ ºÎÆÃ ÈÄ °æ°úÇÑ ½Ã°£À» ms·Î ¹İÈ¯. µû¶ó¼­ tickÀº 1ÃÊ¿¡ 1000¾¿ Áõ°¡ÇÔ 
+      if (tick +30 < GetTickCount()) {   //30msì— í•œë²ˆì”© updategameë˜ë„ë¡ ì„¤ì •   
+         tick = GetTickCount();         //ì»´í“¨í„° ë¶€íŒ… í›„ ê²½ê³¼í•œ ì‹œê°„ì„ msë¡œ ë°˜í™˜. ë”°ë¼ì„œ tickì€ 1ì´ˆì— 1000ì”© ì¦ê°€í•¨ 
          
          UpdateGame();
 
-        if (tick == 0)               //characterÀÇ hp[1]ÀÌ 1¹Ì¸¸ÀÌ µÇ¸é tick = 0 
+        if (tick == 0)               //characterì˜ hp[1]ì´ 1ë¯¸ë§Œì´ ë˜ë©´ tick = 0 
         {
 			PrintGameover();
 			break;
         }
-        if (clear_boss == 2)			//¾Æ¼ö¶ó º¸½º ÀâÀ¸¸é ¿£µù 
+        if (clear_boss == 2)			//ì•„ìˆ˜ë¼ ë³´ìŠ¤ ì¡ìœ¼ë©´ ì—”ë”© 
         {
         	EndingCredit();
         	break;
@@ -153,21 +153,21 @@ int main()
 }
 
 void StartGame() {
-	SetConsole();			//ÄÜ¼ÖÃ¢ °¡·Î ¼¼·Î Å©±â ¼³Á¤, Ä¿¼­ ¾Èº¸ÀÌ°Ô ¼³Á¤ 
+	SetConsole();			//ì½˜ì†”ì°½ ê°€ë¡œ ì„¸ë¡œ í¬ê¸° ì„¤ì •, ì»¤ì„œ ì•ˆë³´ì´ê²Œ ì„¤ì • 
 	srand((int)time(NULL));
 	
-	printf("ÀÌ¸§À» ÀÔ·ÂÇÏ¼¼¿ä : ");
+	printf("ì´ë¦„ì„ ì…ë ¥í•˜ì„¸ìš” : ");
 	scanf("%s", character.name);
 	
-	Fill_Map(figure_floor, '=', MAP_X_MAX);	//¶¥¹è¿­¿¡ '=' Ã¤¿ì±â 
+	Fill_Map(figure_floor, '=', MAP_X_MAX);	//ë•…ë°°ì—´ì— '=' ì±„ìš°ê¸° 
 	
-	objects = (Object **)malloc(sizeof(Object *) * OBJECT_MAX);		//OBJECT_MAX°³ÀÇ objectÆ÷ÀÎÅÍ °ø°£ ÇÒ´ç  
-	memset(objects, 0, sizeof(Object *) * OBJECT_MAX); 				//objects°¡ °¡¸®Å°´Â ³ğÀ» sizeof(object*)*OBJECT_MAX Å©±â¸¸Å­ 0À¸·Î ÃÊ±âÈ­ 
+	objects = (Object **)malloc(sizeof(Object *) * OBJECT_MAX);		//OBJECT_MAXê°œì˜ objectí¬ì¸í„° ê³µê°„ í• ë‹¹  
+	memset(objects, 0, sizeof(Object *) * OBJECT_MAX); 				//objectsê°€ ê°€ë¦¬í‚¤ëŠ” ë†ˆì„ sizeof(object*)*OBJECT_MAX í¬ê¸°ë§Œí¼ 0ìœ¼ë¡œ ì´ˆê¸°í™” 
 }
 
 void SetConsole() {
 	system("mode con:cols=116 lines=36");
-	system("title ±³¼öÀÇ ¸ğÇè");
+	system("title êµìˆ˜ì˜ ëª¨í—˜");
 	
 	HANDLE hConsole;
     CONSOLE_CURSOR_INFO ConsoleCursor;
@@ -179,26 +179,26 @@ void SetConsole() {
 }
 
 void UpdateGame() {
-   Fill_Map(mapData, ' ', MAP_X_MAX * MAP_Y_MAX);   //¸ÊÀ» °ø¹éÀ¸·Î ÃÊ±âÈ­ 
+   Fill_Map(mapData, ' ', MAP_X_MAX * MAP_Y_MAX);   //ë§µì„ ê³µë°±ìœ¼ë¡œ ì´ˆê¸°í™” 
    
-   Control_Character();   //mapData¿¡ Ä³¸¯ÅÍ Á¤º¸ ¾÷µ¥ÀÌÆ® 
-   Control_Object();   //mapData¿¡ Àû,µ¿Àü,¾ÆÀÌÅÛ µî ¾÷µ¥ÀÌÆ®
-   Control_UI();      //¶¥¹è¿­ ¹× »óÅÂÃ¢ ¾÷µ¥ÀÌÆ®  
+   Control_Character();   //mapDataì— ìºë¦­í„° ì •ë³´ ì—…ë°ì´íŠ¸ 
+   Control_Object();   //mapDataì— ì ,ë™ì „,ì•„ì´í…œ ë“± ì—…ë°ì´íŠ¸
+   Control_UI();      //ë•…ë°°ì—´ ë° ìƒíƒœì°½ ì—…ë°ì´íŠ¸  
    
-   if (spon_tick + 5000 < tick && ((clear_boss == 0 && character.score <1800) || (clear_boss == 1 && character.score < 6500))) {      //5ÃÊ¸¶´Ù ¸ó½ºÅÍ ½ºÆù ¹× º¸½ºÀÖÀ»¶§´Â ¾È³ª¿À°Ô 
+   if (spon_tick + 5000 < tick && ((clear_boss == 0 && character.score <1800) || (clear_boss == 1 && character.score < 6500))) {      //5ì´ˆë§ˆë‹¤ ëª¬ìŠ¤í„° ìŠ¤í° ë° ë³´ìŠ¤ìˆì„ë•ŒëŠ” ì•ˆë‚˜ì˜¤ê²Œ 
       spon_tick = tick;
-      Create_Object(rand() % 90, 5, 100);      //(x: 0~90 , y:5) kind = 100 : ½½¶óÀÓ    
+      Create_Object(rand() % 90, 5, 100);      //(x: 0~90 , y:5) kind = 100 : ìŠ¬ë¼ì„    
       Create_Object(rand() % 90, 5, 100);
       Create_Object(rand() % 90, 5, 100);
    }
    
-   if(character.score >= 1800 && character.score <= 3000 && boss_tick1 < tick)      //½ºÄÚ¾î 1800ÀÌ»ó µÇ¸é Ã¹¹ø? º¸½º ÃâÇö kind 400 
+   if(character.score >= 1800 && character.score <= 3000 && boss_tick1 < tick)      //ìŠ¤ì½”ì–´ 1800ì´ìƒ ë˜ë©´ ì²«ë²ˆ? ë³´ìŠ¤ ì¶œí˜„ kind 400 
    {
       Create_Object(MAP_X_MAX-22 ,9,400);
       boss_tick1 += 100000000;
    }
    
-   if(character.score >= 6500 && character.score <= 8000 && boss_tick2 < tick && clear_boss == 1)      //½ºÄÚ¾î 6500ÀÌ»ó µÇ¸é µÎ¹ø? º¸½º ÃâÇö kind 401 
+   if(character.score >= 6500 && character.score <= 8000 && boss_tick2 < tick && clear_boss == 1)      //ìŠ¤ì½”ì–´ 6500ì´ìƒ ë˜ë©´ ë‘ë²ˆ? ë³´ìŠ¤ ì¶œí˜„ kind 401 
    {
       Create_Object(MAP_X_MAX-31 ,3,401);
       boss_tick2 += 100000000;
@@ -226,7 +226,7 @@ void UpdateGame() {
    printf("%s",mapData);   //draw mapData
 }
 
-void ExitGame() {   //objects µ¿Àû¸Ş¸ğ¸® ÇìÁ¦  
+void ExitGame() {   //objects ë™ì ë©”ëª¨ë¦¬ í—¤ì œ  
     for (int i = 0; i < OBJECT_MAX; i++) {
         if (objects[i])
             free(objects[i]);
@@ -235,24 +235,24 @@ void ExitGame() {   //objects µ¿Àû¸Ş¸ğ¸® ÇìÁ¦
     free(objects);
 }
 
-void Draw_Figure(int x, int y, int size_x, int size_y, const char spr[]) {	//(x,y)¸¦ ±âÁØÀ¸·Î size_x*size_yÅ©±â·Î spr[]À» ±×¸² 
+void Draw_Figure(int x, int y, int size_x, int size_y, const char spr[]) {	//(x,y)ë¥¼ ê¸°ì¤€ìœ¼ë¡œ size_x*size_yí¬ê¸°ë¡œ spr[]ì„ ê·¸ë¦¼ 
 	for (int i = 0; i < size_y; i++) {
 		for (int n = 0; n < size_x; n++)
 			Edit_Map(x + n, y + i, spr[i * size_x + n]);
 	}
 }
 
-void Fill_Map(char str[], char ch, int max) {	//str¹è¿­À» ¹®ÀÚ ch·Î max¸¸Å­ Ã¤¿ò 
+void Fill_Map(char str[], char ch, int max) {	//strë°°ì—´ì„ ë¬¸ì chë¡œ maxë§Œí¼ ì±„ì›€ 
 	for (int i = 0; i < max; i++)
 		str[i] = ch;
 }
 
-void Edit_Map(int x, int y, char ch) {	//(x,y)¸¦ ¹®ÀÚch·Î º¯°æ 
+void Edit_Map(int x, int y, char ch) {	//(x,y)ë¥¼ ë¬¸ìchë¡œ ë³€ê²½ 
 	if (x > 0 && y > 0 && x - 1 < MAP_X_MAX && y - 1 < MAP_Y_MAX)
 		mapData[(y - 1) * MAP_X_MAX + x - 1] = ch;
 }
 
-void Draw_Box(int x, int y, int size_x, int size_y) {		//»óÅÂÃ¢¿¡ »óÀÚ ±×¸®´Â ÇÔ¼ö (x,y)¿¡ size_x*size_yÅ©±âÀÇ »óÀÚ ±×¸² 
+void Draw_Box(int x, int y, int size_x, int size_y) {		//ìƒíƒœì°½ì— ìƒì ê·¸ë¦¬ëŠ” í•¨ìˆ˜ (x,y)ì— size_x*size_yí¬ê¸°ì˜ ìƒì ê·¸ë¦¼ 
 	Edit_Map(x, y, '.'); Edit_Map(x + size_x - 1, y, '.');
 	Edit_Map(x, y + size_y - 1, '\''); Edit_Map(x + size_x - 1, y + size_y - 1, '\'');
 	
@@ -264,9 +264,9 @@ void Draw_Box(int x, int y, int size_x, int size_y) {		//»óÅÂÃ¢¿¡ »óÀÚ ±×¸®´Â ÇÔ
 	}
 }
 
-void Draw_Number(int x, int y, int num) {		//(x,y)¿¡  charÇüÀ¸·Î º¯È¯µÈ ¼ıÀÚ¸¦ ±×¸² 
+void Draw_Number(int x, int y, int num) {		//(x,y)ì—  charí˜•ìœ¼ë¡œ ë³€í™˜ëœ ìˆ«ìë¥¼ ê·¸ë¦¼ 
 	int tmp = num, len = NumLen(tmp), index = len;
-    char str[len];		//¼ıÀÚ ÀÚ¸´¼ö+1 Å©±âÀÇ ¹®ÀÚ ¹è¿­ (1ÀÚ¸®´Â ³Î¹®ÀÚ) 
+    char str[len];		//ìˆ«ì ìë¦¿ìˆ˜+1 í¬ê¸°ì˜ ë¬¸ì ë°°ì—´ (1ìë¦¬ëŠ” ë„ë¬¸ì) 
     
     do {
         index--;
@@ -277,7 +277,7 @@ void Draw_Number(int x, int y, int num) {		//(x,y)¿¡  charÇüÀ¸·Î º¯È¯µÈ ¼ıÀÚ¸¦ ±
     Draw_Figure(x, y, len, 1, str);
 }
 
-int NumLen(int num) {		//numÀÇ ÀÚ¸´¼ö¸¦ ¸®ÅÏÇÏ´Â ÇÔ¼ö (Draw_NumberÇÒ¶§ ÇÊ¿ä) 
+int NumLen(int num) {		//numì˜ ìë¦¿ìˆ˜ë¥¼ ë¦¬í„´í•˜ëŠ” í•¨ìˆ˜ (Draw_Numberí• ë•Œ í•„ìš”) 
 	int tmp = num, len = 0;
 	
 	if (num == 0) {
@@ -292,24 +292,24 @@ int NumLen(int num) {		//numÀÇ ÀÚ¸´¼ö¸¦ ¸®ÅÏÇÏ´Â ÇÔ¼ö (Draw_NumberÇÒ¶§ ÇÊ¿ä)
     return len;
 } 
 
-void Control_UI() 	//±â´É : ¶¥±×¸®±â, ¿ŞÂÊ»ó´Ü »óÅÂÃ¢ ±×¸®±â ¹× °»½Å 
+void Control_UI() 	//ê¸°ëŠ¥ : ë•…ê·¸ë¦¬ê¸°, ì™¼ìª½ìƒë‹¨ ìƒíƒœì°½ ê·¸ë¦¬ê¸° ë° ê°±ì‹  
 {
-	int expPer = (character.exp[1] * 100 / character.exp[0]);		//exp[1]Àº ÇöÀç exp, exp[0]Àº ÃÖ´ëexp(·¹º§¾÷) 
+	int expPer = (character.exp[1] * 100 / character.exp[0]);		//exp[1]ì€ í˜„ì¬ exp, exp[0]ì€ ìµœëŒ€exp(ë ˆë²¨ì—…) 
 	int len;	//length of previous sprite
 	
 	Draw_Figure(1, FLOOR_Y, MAP_X_MAX, 1, figure_floor);	//draw floor
 	
 	Draw_Box(1, 2, 35, 8); Draw_Box(27, 5, 7, 4);	//draw weaponinven
-	Draw_Figure(28, 6, 5, 2, figure_invenWeapon[character.weapon]);		//character.weaponÀÌ 0,1·Î °¢ÀÚ ¹«±â ¸ğ¾ç ¹è¿­ ³ªÅ¸³¿ 
+	Draw_Figure(28, 6, 5, 2, figure_invenWeapon[character.weapon]);		//character.weaponì´ 0,1ë¡œ ê°ì ë¬´ê¸° ëª¨ì–‘ ë°°ì—´ ë‚˜íƒ€ëƒ„ 
 	Draw_Figure(28, 4, 6, 1, "Weapon");
 	
 	Edit_Map(3, 3, '\"');	//draw name, lv, exp
-	Draw_Figure(4, 3, strlen(character.name), 1, character.name);	len = 4 + strlen(character.name);//lenÀÌ xÁÂÇ¥¸¦ ³ªÅ¸³¿. °¢ ¹®ÀÚ¿­ ±æÀÌ¸¸Å­ len++½ÃÅ°¸é¼­ ¹®ÀÚ¿­À» ¾Ë¸ÂÀº À§Ä¡¿¡ Ãâ·Â 
+	Draw_Figure(4, 3, strlen(character.name), 1, character.name);	len = 4 + strlen(character.name);//lenì´ xì¢Œí‘œë¥¼ ë‚˜íƒ€ëƒ„. ê° ë¬¸ìì—´ ê¸¸ì´ë§Œí¼ len++ì‹œí‚¤ë©´ì„œ ë¬¸ìì—´ì„ ì•Œë§ì€ ìœ„ì¹˜ì— ì¶œë ¥ 
 	Draw_Figure(len, 3, 7, 1, "\" LV.");	len += 5;
 	Draw_Number(len, 3, character.lv);	len += NumLen(character.lv);
 	Draw_Figure(len, 3, 2, 1, " (");	len += 2;
 	
-	if (!expPer) {	//°æÇèÄ¡ 0%¸é 
+	if (!expPer) {	//ê²½í—˜ì¹˜ 0%ë©´ 
 		Edit_Map(len, 3, '0');	len ++;		 
 	} else {
 		Draw_Number(len, 3, expPer);	len += NumLen(expPer);
@@ -335,36 +335,36 @@ void Control_UI() 	//±â´É : ¶¥±×¸®±â, ¿ŞÂÊ»ó´Ü »óÅÂÃ¢ ±×¸®±â ¹× °»½Å
 
 void Control_Character()
 {	
-	character.attack = FALSE;	//°ø°İº¯¼ö¸¦ ÃÊ±âÈ­ (¾ÈÇÒ ½Ã °ø°İ¸ğ¼Ç¿¡¼­ ¾Èµ¹¾Æ¿È)
+	character.attack = FALSE;	//ê³µê²©ë³€ìˆ˜ë¥¼ ì´ˆê¸°í™” (ì•ˆí•  ì‹œ ê³µê²©ëª¨ì…˜ì—ì„œ ì•ˆëŒì•„ì˜´)
 	character.skill_attack1 = FALSE;
 	character.skill_attack2 = FALSE;
 	 
-	//LV up				exp[1]ÀÌ ÇöÀç exp, exp[0]ÀÌ Max exp 
+	//LV up				exp[1]ì´ í˜„ì¬ exp, exp[0]ì´ Max exp 
 	if (character.exp[1] >= character.exp[0]) {
-		character.lv += character.exp[1] / character.exp[0];	//º¸½º ÀâÀ»½Ã lv¾÷ ¸¹ÀÌ µÇµµ·Ï º¯°æ 
+		character.lv += character.exp[1] / character.exp[0];	//ë³´ìŠ¤ ì¡ì„ì‹œ lvì—… ë§ì´ ë˜ë„ë¡ ë³€ê²½ 
 		character.hp[0] = 100 + character.lv * 5 ; character.mp[0] = 100 + character.lv * 3; 
 		character.exp[1] = 0; character.exp[0] += character.lv * 10;
 		character.power = 10+(character.lv);
 	}
-	//hp,mp gen & control			0.9ÃÊ¸¶´Ù ÇÇÈ¸º¹  
+	//hp,mp gen & control			0.9ì´ˆë§ˆë‹¤ í”¼íšŒë³µ  
 	if (character.tick[0] + 900 < tick) { 
 		character.tick[0] = tick;
 		character.hp[1] += 1;		//
 		character.mp[1] += 3;
 	}
-	if (character.hp[1] > character.hp[0])		//ÃÖ´ë hp,mp¸¦ ÃÊ°úÇÏ·ÁÇÏ¸é ÃÖ´ë°ªÀ¸·Î °íÁ¤  
+	if (character.hp[1] > character.hp[0])		//ìµœëŒ€ hp,mpë¥¼ ì´ˆê³¼í•˜ë ¤í•˜ë©´ ìµœëŒ€ê°’ìœ¼ë¡œ ê³ ì •  
 		character.hp[1] = character.hp[0];
 	if (character.mp[1] > character.mp[0])
 		character.mp[1] = character.mp[0];
 
-	//°ÔÀÓ ¿À¹ö ±¸Çö 	
+	//ê²Œì„ ì˜¤ë²„ êµ¬í˜„ 	
 	if (character.hp[1] < 1)
-		tick = 0;			//tick = 0ÀÌµÇ¸é mainÇÔ¼ö¿¡¼­ while¹®À» Å»ÃâÇØ¼­ °ÔÀÓ ³¡³ª°Ô µÇ¾îÀÖÀ½ 
+		tick = 0;			//tick = 0ì´ë˜ë©´ mainí•¨ìˆ˜ì—ì„œ whileë¬¸ì„ íƒˆì¶œí•´ì„œ ê²Œì„ ëë‚˜ê²Œ ë˜ì–´ìˆìŒ 
  
- 	//±ôºıÀÓ 
-	if (character.tick[3] > 0)		//¸ó½ºÅÍ¿Í Ãæµ¹ÀÌ ³ª¸é character.tick[3] = 100ÀÌ ?. 
+ 	//ê¹œë¹¡ì„ 
+	if (character.tick[3] > 0)		//ëª¬ìŠ¤í„°ì™€ ì¶©ëŒì´ ë‚˜ë©´ character.tick[3] = 100ì´ ?. 
 	{
-		textcolor(15,4); //ÇÇ°İ½Ã »¡°­»ö
+		textcolor(15,4); //í”¼ê²©ì‹œ ë¹¨ê°•ìƒ‰
 		character.tick[3] -= 1;
 	}
 	else 
@@ -372,64 +372,64 @@ void Control_Character()
 		textcolor(0,15); 
 	}
 	
-	//°ø°İ ±¸ÇöºÎ 
-	if (GetAsyncKeyState(0x5A) && character.tick[1] + 150 <= tick ) {	// 0x5A´Â ZÀÇ ¾Æ½ºÅ°ÄÚµå°ª    °ø°İµô·¹ÀÌ 250ms 
+	//ê³µê²© êµ¬í˜„ë¶€ 
+	if (GetAsyncKeyState(0x5A) && character.tick[1] + 150 <= tick ) {	// 0x5AëŠ” Zì˜ ì•„ìŠ¤í‚¤ì½”ë“œê°’    ê³µê²©ë”œë ˆì´ 250ms 
 		character.tick[1] = tick;
 		character.attack = TRUE;
 	}
 
-	//½ºÅ³°ø°İ1 ±¸ÇöºÎ 
-	if (GetAsyncKeyState(0x58) && character.mp[1] > 1 && character.tick[1]+ 30<= tick) {	// 0x5A´Â xÀÇ ¾Æ½ºÅ°ÄÚµå°ª    
+	//ìŠ¤í‚¬ê³µê²©1 êµ¬í˜„ë¶€ 
+	if (GetAsyncKeyState(0x58) && character.mp[1] > 1 && character.tick[1]+ 30<= tick) {	// 0x5AëŠ” xì˜ ì•„ìŠ¤í‚¤ì½”ë“œê°’    
 		character.tick[1] = tick;
 		character.skill_attack1 = TRUE;
 		character.mp[1] -= 1;
 	}
-	//½ºÅ³°ø°İ2 ±¸ÇöºÎ	 
-	if (GetAsyncKeyState(0x41) && character.mp[1] > 2 && character.tick[1]+ 30<= tick) {	// 0x5A´Â xÀÇ ¾Æ½ºÅ°ÄÚµå°ª     
+	//ìŠ¤í‚¬ê³µê²©2 êµ¬í˜„ë¶€	 
+	if (GetAsyncKeyState(0x41) && character.mp[1] > 2 && character.tick[1]+ 30<= tick) {	// 0x5AëŠ” xì˜ ì•„ìŠ¤í‚¤ì½”ë“œê°’     
 		character.tick[1] = tick;
 		character.skill_attack2 = TRUE;
 		character.mp[1] -= 2;
 	}
 
-	//¿òÁ÷ÀÓ±¸ÇöºÎ 
-	if (GetAsyncKeyState(VK_LEFT) && character.position[0] > 1) {	//¿ŞÂÊ È­»ìÇ¥ ´­¸®°í x>1ÀÌ¸é ¿ŞÂÊÀÌµ¿ 
+	//ì›€ì§ì„êµ¬í˜„ë¶€ 
+	if (GetAsyncKeyState(VK_LEFT) && character.position[0] > 1) {	//ì™¼ìª½ í™”ì‚´í‘œ ëˆŒë¦¬ê³  x>1ì´ë©´ ì™¼ìª½ì´ë™ 
 			character.position[0]--;
-			character.direction = FALSE;	//ÁÂÃø¹æÇâ 
+			character.direction = FALSE;	//ì¢Œì¸¡ë°©í–¥ 
 		}
 		
-	if (GetAsyncKeyState(VK_RIGHT) && character.position[0] < MAP_X_MAX - 2) {	//¿À¸¥ÂÊ È­»ìÇ¥ ´­¸®°í x°¡ ¸Ê¿ìÃø³¡º¸´Ù-2ÁöÁ¡º¸´Ù ÀÛÀ¸¸é 
+	if (GetAsyncKeyState(VK_RIGHT) && character.position[0] < MAP_X_MAX - 2) {	//ì˜¤ë¥¸ìª½ í™”ì‚´í‘œ ëˆŒë¦¬ê³  xê°€ ë§µìš°ì¸¡ëë³´ë‹¤-2ì§€ì ë³´ë‹¤ ì‘ìœ¼ë©´ 
 			character.position[0]++;
-			character.direction = TRUE;		//¿ìÃø¹æÇâ 
+			character.direction = TRUE;		//ìš°ì¸¡ë°©í–¥ 
 		}
 		
-	if (GetAsyncKeyState(0x43) && character.tick[2] + 1200 <= tick) {	//dash		0x58Àº XÀÇ ¾Æ½ºÅ°ÄÚµå°ª 	1.2ÃÊ¿¡ ÇÑ¹ø »ç¿ë °¡´É 
-			character.accel[0] = character.direction * 6 - 3;	//character.accel[0]Àº ¿ŞÂÊ¹æÇâ ´ë½¬¸é  -9, ¿À¸¥ÂÊ ¹æÇâ ´ë½¬¸é  +3  
+	if (GetAsyncKeyState(0x43) && character.tick[2] + 1200 <= tick) {	//dash		0x58ì€ Xì˜ ì•„ìŠ¤í‚¤ì½”ë“œê°’ 	1.2ì´ˆì— í•œë²ˆ ì‚¬ìš© ê°€ëŠ¥ 
+			character.accel[0] = character.direction * 6 - 3;	//character.accel[0]ì€ ì™¼ìª½ë°©í–¥ ëŒ€ì‰¬ë©´  -9, ì˜¤ë¥¸ìª½ ë°©í–¥ ëŒ€ì‰¬ë©´  +3  
 			character.tick[2] = tick;
 		}
 		
 	if (GetAsyncKeyState(VK_UP) && character.position[1] + 3 == FLOOR_Y)	//jump
 			character.accel[1] = -1.75;
 	
-	Movement_Control(character.position, character.accel, character.size, &character.flyTime);	// control character movement  Áß·Â±¸Çö 
-	//Ä³¸¯ÅÍ ¸Ó¸®À§¿¡ ÀÌ¸§ 
+	Movement_Control(character.position, character.accel, character.size, &character.flyTime);	// control character movement  ì¤‘ë ¥êµ¬í˜„ 
+	//ìºë¦­í„° ë¨¸ë¦¬ìœ„ì— ì´ë¦„ 
 	Draw_Figure(character.position[0]+1-strlen(character.name)/2,character.position[1]-2,strlen(character.name),1,character.name);
-	//Ä³¸¯ÅÍ ±×¸®´Â ºÎºĞ 
-	if (character.tick[3] % 2 == 0) {		//¹«ÀûtickÀÌ Â¦¼ö¸é (¹«ÀûtickÀÌ 100¿¡¼­ 1¾¿ °è¼Ó ÁÙ¾îµë. µû¶ó¼­ Ä³¸¯ÅÍ°¡ ±ôºıÀÌ°Ô ?)
-		Draw_Figure(character.position[0], character.position[1], character.size[0], character.size[1], figure_character);	//Ä³¸¯ÅÍ ±×¸² 
+	//ìºë¦­í„° ê·¸ë¦¬ëŠ” ë¶€ë¶„ 
+	if (character.tick[3] % 2 == 0) {		//ë¬´ì tickì´ ì§ìˆ˜ë©´ (ë¬´ì tickì´ 100ì—ì„œ 1ì”© ê³„ì† ì¤„ì–´ë“¬. ë”°ë¼ì„œ ìºë¦­í„°ê°€ ê¹œë¹¡ì´ê²Œ ?)
+		Draw_Figure(character.position[0], character.position[1], character.size[0], character.size[1], figure_character);	//ìºë¦­í„° ê·¸ë¦¼ 
 		
 		
-		if (character.direction) {//¿À¸¥ÂÊ¹æÇâÀÌ¸é ¸öÅë ¿À¸¥ÂÊÀ¸·Î 
+		if (character.direction) {//ì˜¤ë¥¸ìª½ë°©í–¥ì´ë©´ ëª¸í†µ ì˜¤ë¥¸ìª½ìœ¼ë¡œ 
 			Edit_Map(character.position[0], character.position[1] + 1, '(');
-		} else {				  //¿ŞÂÊ¹æÇâÀÌ¸é  ¸öÅë ¿ŞÂÊÀ¸·Î 
+		} else {				  //ì™¼ìª½ë°©í–¥ì´ë©´  ëª¸í†µ ì™¼ìª½ìœ¼ë¡œ 
 			Edit_Map(character.position[0] + 2, character.position[1] + 1, ')');
 		}
 		
-		if (character.accel[0] > 1)  //xÅ°°¡ ´­¸®°í(dash) ¿À¸¥ÂÊ ¹æÇâÀ» º¸°íÀÖ´Â °æ¿ì- Ä³¸¯ÅÍ ¿ŞÂÊ¿¡ »ş»ş¼¡È¿°ú   
+		if (character.accel[0] > 1)  //xí‚¤ê°€ ëˆŒë¦¬ê³ (dash) ì˜¤ë¥¸ìª½ ë°©í–¥ì„ ë³´ê³ ìˆëŠ” ê²½ìš°- ìºë¦­í„° ì™¼ìª½ì— ìƒ¤ìƒ¤ìƒ¥íš¨ê³¼   
 			Draw_Figure(character.position[0] - 2, character.position[1], 1, 3, "===");
-		if (character.accel[0] < -1) //xÅ°°¡ ´­¸®°í(dash) ¿ŞÂÊ ¹æÇâÀ» º¸°íÀÖ´Â °æ¿ì - Ä³¸¯ÅÍ ¿À¸¥ÂÊ¿¡ »ş»ş¼¡È¿°ú 
+		if (character.accel[0] < -1) //xí‚¤ê°€ ëˆŒë¦¬ê³ (dash) ì™¼ìª½ ë°©í–¥ì„ ë³´ê³ ìˆëŠ” ê²½ìš° - ìºë¦­í„° ì˜¤ë¥¸ìª½ì— ìƒ¤ìƒ¤ìƒ¥íš¨ê³¼ 
 			Draw_Figure(character.position[0] + 4, character.position[1], 1, 3, "===");
 		
-		//°ø°İ¸ğ¼Ç ±×¸®±â ºÎºĞ  
+		//ê³µê²©ëª¨ì…˜ ê·¸ë¦¬ê¸° ë¶€ë¶„  
 		if (character.attack==TRUE ) {
 					Edit_Map(character.position[0] - 2 + 6 * character.direction, character.position[1] + 1, 'o');
 					Draw_Figure(character.position[0] - 5 + 10 * character.direction, character.position[1] + 1, 3, 1, figure_weapon[character.direction][character.weapon]);
@@ -439,8 +439,8 @@ void Control_Character()
 					Draw_Figure(character.position[0] - 3 + 6 * character.direction, character.position[1] + 1, 3, 1, figure_weapon[character.direction][character.weapon]);
 				}
 		
-		//½ºÅ³¸ğ¼Ç1 ±×¸®±â ºÎºĞ 
-		if (character.skill_attack1 == TRUE && character.direction == TRUE)		//½ºÅ³ ½ÃÀü,  ¿À¸¥ÂÊ ¹æÇâ 
+		//ìŠ¤í‚¬ëª¨ì…˜1 ê·¸ë¦¬ê¸° ë¶€ë¶„ 
+		if (character.skill_attack1 == TRUE && character.direction == TRUE)		//ìŠ¤í‚¬ ì‹œì „,  ì˜¤ë¥¸ìª½ ë°©í–¥ 
 		{	
 			int i;
 			for(i=0; i<MAP_X_MAX - character.position[0]-4; i++);
@@ -450,7 +450,7 @@ void Control_Character()
 			Draw_Figure(character.position[0] +4 ,character.position[1]+2 ,i+3, 1, "---------------------------------------------------------------------------------------------------------------------------------------------------------------------");
 			}
 		}
-		if (character.skill_attack1 == TRUE && character.direction == FALSE)		//½ºÅ³ ½ÃÀü,  ,¿ŞÂÊ ¹æÇâ 
+		if (character.skill_attack1 == TRUE && character.direction == FALSE)		//ìŠ¤í‚¬ ì‹œì „,  ,ì™¼ìª½ ë°©í–¥ 
 		{	
 			int i;
 			for(i=0; i<MAP_X_MAX - character.position[0]-4; i++);
@@ -458,10 +458,10 @@ void Control_Character()
 			Draw_Figure(0,character.position[1]+1 ,character.position[0]-1, 1, "@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@");
 			Draw_Figure(0,character.position[1]+2 ,character.position[0]-1, 1, "---------------------------------------------------------------------------------------------------------------------------------------------------------------------");
 		}
-		//½ºÅ³¸ğ¼Ç2 ±×¸®±â ºÎºĞ 
+		//ìŠ¤í‚¬ëª¨ì…˜2 ê·¸ë¦¬ê¸° ë¶€ë¶„ 
 		if (character.skill_attack2 == TRUE)
 		{
-			Draw_Figure(107,27,10,5,"|\\_/|\"    |q p|   /}( 0 )\"\"\"\\ |\"^\"`    |||_/=\\\\__|");		//°­¾ÆÁö ¸ğ¾ç
+			Draw_Figure(107,27,10,5,"|\\_/|\"    |q p|   /}( 0 )\"\"\"\\ |\"^\"`    |||_/=\\\\__|");		//ê°•ì•„ì§€ ëª¨ì–‘
 			Draw_Figure(0,28,106,2,"<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<");
 		} 
 			
@@ -472,34 +472,34 @@ void Movement_Control(int position[], float accel[], int size[], float *flyTime)
 	float y_value = accel[1];
 	
 	if (position[1] + size[1] == FLOOR_Y) {
-		*flyTime = 0;		//¶¥¿¡ ´ê¾ÆÀÖÀ¸¸é flyTime = 0 
-	} else {				//¶³¾îÁ® ÀÖÀ¸¸é flyTime += 0.05 
+		*flyTime = 0;		//ë•…ì— ë‹¿ì•„ìˆìœ¼ë©´ flyTime = 0 
+	} else {				//ë–¨ì–´ì ¸ ìˆìœ¼ë©´ flyTime += 0.05 
 		*flyTime += 0.05;
 		accel[1] += *flyTime; 
 	}
 	
 	if (y_value != 0) {
-		if (position[1] + size[1] + y_value > FLOOR_Y)		//¶¥À¸·Î ²¨Á®¼­ Ãß¶ôÇÏ´Â°Å ¹æÁö  
+		if (position[1] + size[1] + y_value > FLOOR_Y)		//ë•…ìœ¼ë¡œ êº¼ì ¸ì„œ ì¶”ë½í•˜ëŠ”ê±° ë°©ì§€  
 			y_value = FLOOR_Y - position[1] - size[1];
 	}
 
 	position[0] += accel[0] + 0.5; position[1] += y_value + 0.5;	  
 	
-	//accelÀÌ 0ÀÌµÇ¸é ¾Æ·¡ ¹®ÀåµéÀº ½ÇÇàÀÌ ¾È?. 
+	//accelì´ 0ì´ë˜ë©´ ì•„ë˜ ë¬¸ì¥ë“¤ì€ ì‹¤í–‰ì´ ì•ˆ?. 
 	if (accel[0] > 0) accel[0] -= 0.2; if (accel[0] < 0) accel[0] += 0.2;
 	if (accel[1] > 0) accel[1] -= 0.1; if (accel[1] < 0) accel[1] += 0.1;
 }
 
-bool Enemy_Position(int x, int size_x) {      //Ä³¸¯ÅÍÀÇ Áß¾ÓÀÌ  ¸ó½ºÅÍÀÇ Áß¾Óº¸´Ù ¿ŞÂÊÀÌ¸é FALSE
+bool Enemy_Position(int x, int size_x) {      //ìºë¦­í„°ì˜ ì¤‘ì•™ì´  ëª¬ìŠ¤í„°ì˜ ì¤‘ì•™ë³´ë‹¤ ì™¼ìª½ì´ë©´ FALSE
    if (character.position[0] + 1 < x + size_x / 2)
       return FALSE;
    else
       return TRUE;
 }
 
-bool Check_Collision(int position1[], int position2[], int size1[], int size2[]) {	//Ãæµ¿ Ã¼Å© ÇÔ¼ö 
-	if (position1[0] > position2[0] - size1[0] && position1[0] < position2[0] + size2[0]	//position2[0]-size1[0] = ¸ó½ºÅÍ ½ÃÀÛÁöÁ¡-Ä³¸¯ÅÍ °¡·ÎÅ©±â , position2[0]+size2[0] = ¸ó½ºÅÍÀÇ ¿ìÃø ³¡
-	    && position1[1] > position2[1] - size1[1] && position1[1] < position2[1] + size2[1])	//y°ª Ãæµ¹ 
+bool Check_Collision(int position1[], int position2[], int size1[], int size2[]) {	//ì¶©ë™ ì²´í¬ í•¨ìˆ˜ 
+	if (position1[0] > position2[0] - size1[0] && position1[0] < position2[0] + size2[0]	//position2[0]-size1[0] = ëª¬ìŠ¤í„° ì‹œì‘ì§€ì -ìºë¦­í„° ê°€ë¡œí¬ê¸° , position2[0]+size2[0] = ëª¬ìŠ¤í„°ì˜ ìš°ì¸¡ ë
+	    && position1[1] > position2[1] - size1[1] && position1[1] < position2[1] + size2[1])	//yê°’ ì¶©ëŒ 
 		{
 			return TRUE;
 		}
@@ -509,7 +509,7 @@ bool Check_Collision(int position1[], int position2[], int size1[], int size2[])
 	}
 }
 
-void Create_Object(int x, int y, int kind) {      //x,yÁÂÇ¥¿¡ kind°ª¿¡ µû¶ó ¿ÀºêÁ§Æ® »ı¼º (1~99: ¾ÆÀÌÅÛ, 100~199: ¸ó½ºÅÍ, 200~299: µ¿Àü, 400:°Å¹Ìº¸½º 401:¾Æ¼ö¶óº¸½º 500~: º¸½º ½ºÅ³µé)
+void Create_Object(int x, int y, int kind) {      //x,yì¢Œí‘œì— kindê°’ì— ë”°ë¼ ì˜¤ë¸Œì íŠ¸ ìƒì„± (1~99: ì•„ì´í…œ, 100~199: ëª¬ìŠ¤í„°, 200~299: ë™ì „, 400:ê±°ë¯¸ë³´ìŠ¤ 401:ì•„ìˆ˜ë¼ë³´ìŠ¤ 500~: ë³´ìŠ¤ ìŠ¤í‚¬ë“¤)
    int index = 0;
    Object *obj = 0;
    
@@ -523,20 +523,20 @@ void Create_Object(int x, int y, int kind) {      //x,yÁÂÇ¥¿¡ kind°ª¿¡ µû¶ó ¿Àºê
        index ++;
    }
    
-    obj = (Object *)malloc(sizeof(Object));    //obj°¡ »õ·Î¿î object¸¦ °¡¸®Å´  
-    objects[index] = obj;                    //ÀÌÁßÆ÷ÀÎÅÍ ¹è¿­ objects°¡ obj°¡ °¡¸®Å°´Â ÁÖ¼Ò¸¦ °¡¸®Å´  
-    memset(obj, 0, sizeof(Object));          //object¸¦ 0À¸·Î ÃÊ±âÈ­ 
+    obj = (Object *)malloc(sizeof(Object));    //objê°€ ìƒˆë¡œìš´ objectë¥¼ ê°€ë¦¬í‚´  
+    objects[index] = obj;                    //ì´ì¤‘í¬ì¸í„° ë°°ì—´ objectsê°€ objê°€ ê°€ë¦¬í‚¤ëŠ” ì£¼ì†Œë¥¼ ê°€ë¦¬í‚´  
+    memset(obj, 0, sizeof(Object));          //objectë¥¼ 0ìœ¼ë¡œ ì´ˆê¸°í™” 
     
-    obj->kind = kind;                     //objectÁ¾·ù¿¡ kind ³ÖÀ½ 
+    obj->kind = kind;                     //objectì¢…ë¥˜ì— kind ë„£ìŒ 
     obj->position[0] = x; obj->position[1] = y;
     obj->tick[0] = 0;
     
-    if (kind <400 && (kind < 100 || kind > 199)) {      //0~100,200~399 -->  ¸ó½ºÅÍ¾Æ´Ô  
-      obj->tick[1] = 0;   //µ¿Àü °¡¼Óµµ µô·¹ÀÌ 
+    if (kind <400 && (kind < 100 || kind > 199)) {      //0~100,200~399 -->  ëª¬ìŠ¤í„°ì•„ë‹˜  
+      obj->tick[1] = 0;   //ë™ì „ ê°€ì†ë„ ë”œë ˆì´ 
    }
    
-    if (kind >= 100 && kind < 200) {      //kind°¡ 100~199  -->  ¸ó½ºÅÍ  
-       obj->hp[0] = 150;      //¸ó½ºÅÍ¸¦ ÀÏ´Ü kind100À» ½½¶óÀÓÀ¸·Î ÇØ³ùÀ½ 
+    if (kind >= 100 && kind < 200) {      //kindê°€ 100~199  -->  ëª¬ìŠ¤í„°  
+       obj->hp[0] = 150;      //ëª¬ìŠ¤í„°ë¥¼ ì¼ë‹¨ kind100ì„ ìŠ¬ë¼ì„ìœ¼ë¡œ í•´ë†¨ìŒ 
       obj->hp[1] = obj->hp[0];
        obj->exp = 30;
        obj->size[0] = 4;
@@ -546,8 +546,8 @@ void Create_Object(int x, int y, int kind) {      //x,yÁÂÇ¥¿¡ kind°ª¿¡ µû¶ó ¿Àºê
        obj->tick[3] = 0;
    }
    
-   //°Å¹Ì º¸½º 
-   if(kind == 400) //spider º¸½º´Â kind 400 
+   //ê±°ë¯¸ ë³´ìŠ¤ 
+   if(kind == 400) //spider ë³´ìŠ¤ëŠ” kind 400 
    {
       obj->hp[0] = 500;      
       obj->hp[1] = obj->hp[0];
@@ -556,8 +556,8 @@ void Create_Object(int x, int y, int kind) {      //x,yÁÂÇ¥¿¡ kind°ª¿¡ µû¶ó ¿Àºê
       obj->size[1] = 18;
    }
    
-   //¾Æ¼ö¶ó º¸½º 
-   if(kind == 401) // ¾Æ¼ö¶ó º¸½º´Â kind 401 
+   //ì•„ìˆ˜ë¼ ë³´ìŠ¤ 
+   if(kind == 401) // ì•„ìˆ˜ë¼ ë³´ìŠ¤ëŠ” kind 401 
    {
       	obj->hp[0] = 1000;      
       	obj->hp[1] = obj->hp[0];
@@ -566,7 +566,7 @@ void Create_Object(int x, int y, int kind) {      //x,yÁÂÇ¥¿¡ kind°ª¿¡ µû¶ó ¿Àºê
       	obj->size[1] = 30;
    }
    
-   //°Å¹Ì º¸½º ½ºÅ³ (»õ³¢°Å¹Ì ¸ó½ºÅÍ)
+   //ê±°ë¯¸ ë³´ìŠ¤ ìŠ¤í‚¬ (ìƒˆë¼ê±°ë¯¸ ëª¬ìŠ¤í„°)
    if(kind == 500) 
    {
       	obj->hp[0] = 150;  
@@ -579,7 +579,7 @@ void Create_Object(int x, int y, int kind) {      //x,yÁÂÇ¥¿¡ kind°ª¿¡ µû¶ó ¿Àºê
        obj->tick[3] = 0;
    }
    
-    //¾Æ¼ö¶ó º¸½º ½ºÅ³ 
+    //ì•„ìˆ˜ë¼ ë³´ìŠ¤ ìŠ¤í‚¬ 
    if(kind == 501) 
    {
       	obj->hp[0] = 1;      
@@ -595,11 +595,11 @@ void Control_Item(int index) {
    int item_position[2] = {x, y - 2};
    int item_size[2] = {5, 2};
    
-   if (Check_Collision(item_position, character.position, item_size, character.size)) {      //¾ÆÀÌÅÛ°ú Ä³¸¯ÅÍ°¡ Ãæµ¹ÀÌ ³ª¸é 
-      Draw_Figure(x + 1, y - 5, 3, 1, "[E]");      //¾ÆÀÌÅÛ À§¿¡ [E] Ç¥½Ã  
+   if (Check_Collision(item_position, character.position, item_size, character.size)) {      //ì•„ì´í…œê³¼ ìºë¦­í„°ê°€ ì¶©ëŒì´ ë‚˜ë©´ 
+      Draw_Figure(x + 1, y - 5, 3, 1, "[E]");      //ì•„ì´í…œ ìœ„ì— [E] í‘œì‹œ  
       
-      if (GetAsyncKeyState(0x45)) {      //EÅ°°¡ ´­¸®¸é 
-         character.weapon = objects[index]->kind;   //character.weapon = ¹«±â¹øÈ£(kind°ª) 
+      if (GetAsyncKeyState(0x45)) {      //Eí‚¤ê°€ ëˆŒë¦¬ë©´ 
+         character.weapon = objects[index]->kind;   //character.weapon = ë¬´ê¸°ë²ˆí˜¸(kindê°’) 
       
          Remove_Object(index);
          return;
@@ -614,8 +614,8 @@ void Control_Item(int index) {
 
 void Control_Enemy(int index) {
    int x = objects[index]->position[0], y = objects[index]->position[1];
-   int attack_position[2] = {character.position[0] - 5 + 8 * character.direction, character.position[1]}, attack_size[2] = {5, 3};      //Ä³¸¯ÅÍ ±âº» °ø°İ ¹üÀ§ : Ä³¸¯ÅÍ ¾ÕºÎºĞ¿¡¼­ 5*3Å©±â 
-   //½ºÅ³ ¹üÀ§ 
+   int attack_position[2] = {character.position[0] - 5 + 8 * character.direction, character.position[1]}, attack_size[2] = {5, 3};      //ìºë¦­í„° ê¸°ë³¸ ê³µê²© ë²”ìœ„ : ìºë¦­í„° ì•ë¶€ë¶„ì—ì„œ 5*3í¬ê¸° 
+   //ìŠ¤í‚¬ ë²”ìœ„ 
    int skill1_left_position[2] = {0,character.position[1]};
    int skill1_right_position[2] = {character.position[0]+2,character.position[1]};
    int skill1_left_size[2] = {character.position[0]-2,3};
@@ -624,19 +624,19 @@ void Control_Enemy(int index) {
    int skill2_size[2]   = {106,3}; 
    
    int item_code = rand() % 100;
-   	 //¸ó½ºÅÍ°¡ Á×À¸¸é 
+   	 //ëª¬ìŠ¤í„°ê°€ ì£½ìœ¼ë©´ 
 	if (objects[index]->hp[1] < 1) {
-	    if(objects[index]->kind == 100)	//½½¶óÀÓ Á×ÀÌ¸é µ¿Àü 3°³ ¶³¾îÁü 
+	    if(objects[index]->kind == 100)	//ìŠ¬ë¼ì„ ì£½ì´ë©´ ë™ì „ 3ê°œ ë–¨ì–´ì§ 
 			for (int i = 0; i < 3; i++)  
 		   		Create_Object(x + objects[index]->size[0] / 2, y + objects[index]->size[1] / 2, 200); 
 		
-		//°Å¹Ì º¸½º°¡ Á×À¸¸é
+		//ê±°ë¯¸ ë³´ìŠ¤ê°€ ì£½ìœ¼ë©´
 		if(objects[index]->kind == 400)
 		{
 			clear_boss = 1; 
-			Create_Object(x + objects[index]->size[0] / 2 - 2, y, 1);   //1¹ø¹«±â ¶³±À 
+			Create_Object(x + objects[index]->size[0] / 2 - 2, y, 1);   //1ë²ˆë¬´ê¸° ë–¨êµ¼ 
 		}
-		//¾Æ¼ö¶ó º¸½º°¡ Á×À¸¸é 
+		//ì•„ìˆ˜ë¼ ë³´ìŠ¤ê°€ ì£½ìœ¼ë©´ 
 		if(objects[index]->kind == 401)
 			clear_boss = 2; 
 			
@@ -646,31 +646,31 @@ void Control_Enemy(int index) {
 	    return;
 	}
    
-   if (objects[index]->tick[0] + 2000 > tick) //¸ó½ºÅÍ°¡ °ø°İ¹ŞÀº ÈÄ 2ÃÊµ¿¾È  
-      Draw_Number(x + objects[index]->size[0] / 2 - NumLen(objects[index]->hp[1]) / 2, y - 1, objects[index]->hp[1]);   //¸ó½ºÅÍ ¸Ó¸®À§¿¡ hp¶ß°ÔÇÔ 
+   if (objects[index]->tick[0] + 2000 > tick) //ëª¬ìŠ¤í„°ê°€ ê³µê²©ë°›ì€ í›„ 2ì´ˆë™ì•ˆ  
+      Draw_Number(x + objects[index]->size[0] / 2 - NumLen(objects[index]->hp[1]) / 2, y - 1, objects[index]->hp[1]);   //ëª¬ìŠ¤í„° ë¨¸ë¦¬ìœ„ì— hpëœ¨ê²Œí•¨ 
    
-   if (character.attack == TRUE && Check_Collision(objects[index]->position, attack_position, objects[index]->size, attack_size)) {      //Ä³¸¯ÅÍ°¡ °ø°İÁß && ¸ó½ºÅÍÀ§Ä¡¿Í Ä³¸¯ÅÍ °ø°İ¹üÀ§°¡ Ãæµ¹³ª¸é 
-      objects[index]->tick[0] = tick;      //¸ó½ºÅÍ hp tickÀÌ tick°ú °°¾ÆÁö¹Ç·Î 2ÃÊµ¿¾È ¸Ó¸®À§¿¡ hp¶ä 
+   if (character.attack == TRUE && Check_Collision(objects[index]->position, attack_position, objects[index]->size, attack_size)) {      //ìºë¦­í„°ê°€ ê³µê²©ì¤‘ && ëª¬ìŠ¤í„°ìœ„ì¹˜ì™€ ìºë¦­í„° ê³µê²©ë²”ìœ„ê°€ ì¶©ëŒë‚˜ë©´ 
+      objects[index]->tick[0] = tick;      //ëª¬ìŠ¤í„° hp tickì´ tickê³¼ ê°™ì•„ì§€ë¯€ë¡œ 2ì´ˆë™ì•ˆ ë¨¸ë¦¬ìœ„ì— hpëœ¸ 
       objects[index]->hp[1] -= character.power;
-      objects[index]->accel[1] = - 0.55;      //y°¡¼Óµµ : °øÁß¿¡ Á¶±İ ¶ä 
+      objects[index]->accel[1] = - 0.55;      //yê°€ì†ë„ : ê³µì¤‘ì— ì¡°ê¸ˆ ëœ¸ 
       
-      //x °¡¼Óµµ : ¿·À¸·Î Á¶±İ ¹Ğ·Á³²  
-      if (Enemy_Position(x,  objects[index]->size[0]))      //¸ó½ºÅÍ°¡ ÁÂÃø¿¡ À§Ä¡½Ã  
+      //x ê°€ì†ë„ : ì˜†ìœ¼ë¡œ ì¡°ê¸ˆ ë°€ë ¤ë‚¨  
+      if (Enemy_Position(x,  objects[index]->size[0]))      //ëª¬ìŠ¤í„°ê°€ ì¢Œì¸¡ì— ìœ„ì¹˜ì‹œ  
          objects[index]->accel[0] = -0.75;      
-      else                                    //¸ó½ºÅÍ ¿ìÃø¿¡ À§Ä¡½Ã 
+      else                                    //ëª¬ìŠ¤í„° ìš°ì¸¡ì— ìœ„ì¹˜ì‹œ 
          objects[index]->accel[0] = 0.75;
    }
-   //¿ŞÂÊ ½ºÅ³1 °ø°İ ÇÇ°İ ÆÇÁ¤ 
+   //ì™¼ìª½ ìŠ¤í‚¬1 ê³µê²© í”¼ê²© íŒì • 
    if (character.skill_attack1 == TRUE && character.direction == FALSE && Check_Collision(objects[index]->position, skill1_left_position, objects[index]->size, skill1_left_size))
    {
       objects[index]->tick[0] = tick;
       objects[index]->hp[1] -= 5;
-      //¸ó½ºÅÍ ¾à°£ ¶ä 
+      //ëª¬ìŠ¤í„° ì•½ê°„ ëœ¸ 
       objects[index]->accel[1] = - 0.55;
-      //¸ó½ºÅÍ ¾à°£ ¹Ğ·Á³² 
+      //ëª¬ìŠ¤í„° ì•½ê°„ ë°€ë ¤ë‚¨ 
       objects[index]->accel[0] = -0.75;
    }
-   //¿À¸¥ÂÊ ½ºÅ³1 °ø°İ ÇÇ°İ ÆÇÁ¤
+   //ì˜¤ë¥¸ìª½ ìŠ¤í‚¬1 ê³µê²© í”¼ê²© íŒì •
    if (character.skill_attack1 == TRUE && character.direction == TRUE && Check_Collision(objects[index]->position, skill1_right_position, objects[index]->size, skill1_right_size))
    {
       objects[index]->tick[0] = tick;
@@ -679,7 +679,7 @@ void Control_Enemy(int index) {
       objects[index]->accel[1] = - 0.55;
       objects[index]->accel[0] = 0.75;
    }
-   //°­¾ÆÁö ½ºÅ³ °ø°İ ÇÇ°İ ÆÇÁ¤ 
+   //ê°•ì•„ì§€ ìŠ¤í‚¬ ê³µê²© í”¼ê²© íŒì • 
    if (character.skill_attack2 == TRUE && Check_Collision(objects[index]->position, skill2_position, objects[index]->size, skill2_size))
    {
       objects[index]->tick[0] = tick;
@@ -689,32 +689,32 @@ void Control_Enemy(int index) {
       objects[index]->accel[0] = -0.75;
    
    }
-   //kind == 100 : ½½¶óÀÓ
+   //kind == 100 : ìŠ¬ë¼ì„
    if (objects[index]->kind == 100) {
       
-      //¸ğ¼Ç°ª¿¡ µû¶ó ½½¶óÀÓ ¸ğ¾ç ´Ù¸£°Ô ±×¸®±â À§ÇØ¼­ 
+      //ëª¨ì…˜ê°’ì— ë”°ë¼ ìŠ¬ë¼ì„ ëª¨ì–‘ ë‹¤ë¥´ê²Œ ê·¸ë¦¬ê¸° ìœ„í•´ì„œ 
       if (y + objects[index]->size[1] == FLOOR_Y)
-         objects[index]->isJumping = 0;   //½½¶óÀÓÀÌ ¶¥¿¡ ºÙ¾îÀÖÀ¸¸é isJumping = 0 
+         objects[index]->isJumping = 0;   //ìŠ¬ë¼ì„ì´ ë•…ì— ë¶™ì–´ìˆìœ¼ë©´ isJumping = 0 
       else 
          objects[index]->isJumping = 1;
 
-      //½½¶óÀÓ ¿òÁ÷ÀÓ ±¸Çö 
+      //ìŠ¬ë¼ì„ ì›€ì§ì„ êµ¬í˜„ 
       if (objects[index]->tick[1] + objects[index]->tick[2] < tick) {
          objects[index]->tick[1] = tick;
-         objects[index]->tick[2] = 1000 + rand()%2000;   //if¹®ÀÌ 1ÃÊ+(0~2ÃÊ)¿¡ ÇÑ¹ø¾¿ ½ÇÇà. µû¶ó¼­ °¢ ½½¶óÀÓÀÌ 0~3ÃÊ¿¡ ÇÑ¹ø¾¿ ¿òÁ÷ÀÓ 
+         objects[index]->tick[2] = 1000 + rand()%2000;   //ifë¬¸ì´ 1ì´ˆ+(0~2ì´ˆ)ì— í•œë²ˆì”© ì‹¤í–‰. ë”°ë¼ì„œ ê° ìŠ¬ë¼ì„ì´ 0~3ì´ˆì— í•œë²ˆì”© ì›€ì§ì„ 
          
-         //½½¶óÀÓ y°¡¼Óµµ ¼³Á¤(Á¡ÇÁ) 
+         //ìŠ¬ë¼ì„ yê°€ì†ë„ ì„¤ì •(ì í”„) 
          objects[index]->accel[1] = - 0.75;
-         //½½¶óÀÓ x°¡¼Óµµ ¼³Á¤(xÃà ÀÌµ¿) 
+         //ìŠ¬ë¼ì„ xê°€ì†ë„ ì„¤ì •(xì¶• ì´ë™) 
          if (Enemy_Position(x,  objects[index]->size[0]))
             objects[index]->accel[0] = 1.5;
          else
             objects[index]->accel[0] = -1.5;
       }
       
-      //½½¶óÀÓ°ú Ä³¸¯ÅÍ Ãæµ¹ 
-      if (character.tick[3] == 0 && Check_Collision(objects[index]->position,character.position, objects[index]->size, character.size)) { //Ä³¸¯ÅÍÀÇ ÇÇ°İ½Ã ¹«Àû tick ==0 ÀÌ°í ¸ó½ºÅÍ¿Í Ãæµ¹ÀÌ ³ª¸é 
-         character.tick[3] = 100;   //Ä³¸¯ÅÍÀÇ ÇÇ°İ½Ã ¹«Àû tick = 100    (100¿¡¼­ 1¾¿ ÁÙ¾îµë. 0±îÁö ´Ù½Ã ÁÙ¾îµé¾î¾ß ´Ù½Ã ÇÇ°İÆÇÁ¤ °¡´É)
+      //ìŠ¬ë¼ì„ê³¼ ìºë¦­í„° ì¶©ëŒ 
+      if (character.tick[3] == 0 && Check_Collision(objects[index]->position,character.position, objects[index]->size, character.size)) { //ìºë¦­í„°ì˜ í”¼ê²©ì‹œ ë¬´ì  tick ==0 ì´ê³  ëª¬ìŠ¤í„°ì™€ ì¶©ëŒì´ ë‚˜ë©´ 
+         character.tick[3] = 100;   //ìºë¦­í„°ì˜ í”¼ê²©ì‹œ ë¬´ì  tick = 100    (100ì—ì„œ 1ì”© ì¤„ì–´ë“¬. 0ê¹Œì§€ ë‹¤ì‹œ ì¤„ì–´ë“¤ì–´ì•¼ ë‹¤ì‹œ í”¼ê²©íŒì • ê°€ëŠ¥)
          character.hp[1] -= 10;
       }
       
@@ -722,14 +722,14 @@ void Control_Enemy(int index) {
       Movement_Control(objects[index]->position, objects[index]->accel, objects[index]->size, &objects[index]->flyTime);
    }
    
-   //°Å¹Ìº¸½º : kind 400 
+   //ê±°ë¯¸ë³´ìŠ¤ : kind 400 
    if(objects[index] -> kind == 400)
    {
-      if (character.tick[3] == 0 && Check_Collision(objects[index]->position,character.position, objects[index]->size, character.size)) { //Ä³¸¯ÅÍÀÇ ÇÇ°İ½Ã ¹«Àû tick ==0 ÀÌ°í ¸ó½ºÅÍ¿Í Ãæµ¹ÀÌ ³ª¸é 
-         character.tick[3] = 100;   //Ä³¸¯ÅÍÀÇ ÇÇ°İ½Ã ¹«Àû tick = 100    (100¿¡¼­ 1¾¿ ÁÙ¾îµë. 0±îÁö ´Ù½Ã ÁÙ¾îµé¾î¾ß ´Ù½Ã ÇÇ°İÆÇÁ¤ °¡´É)
+      if (character.tick[3] == 0 && Check_Collision(objects[index]->position,character.position, objects[index]->size, character.size)) { //ìºë¦­í„°ì˜ í”¼ê²©ì‹œ ë¬´ì  tick ==0 ì´ê³  ëª¬ìŠ¤í„°ì™€ ì¶©ëŒì´ ë‚˜ë©´ 
+         character.tick[3] = 100;   //ìºë¦­í„°ì˜ í”¼ê²©ì‹œ ë¬´ì  tick = 100    (100ì—ì„œ 1ì”© ì¤„ì–´ë“¬. 0ê¹Œì§€ ë‹¤ì‹œ ì¤„ì–´ë“¤ì–´ì•¼ ë‹¤ì‹œ í”¼ê²©íŒì • ê°€ëŠ¥)
          character.hp[1] -= 30;
       }
-    //°Å¹ÌÁÙ ¹× °Å¹Ìº¸½º ±×¸®±â 
+    //ê±°ë¯¸ì¤„ ë° ê±°ë¯¸ë³´ìŠ¤ ê·¸ë¦¬ê¸° 
 	Draw_Figure(45, 1, 1, 20, "||||||||||||||||||||||||||||||");
     Draw_Figure(47, 1, 1, 19, "|||||||||||||||||||||||||||||");
     Draw_Figure(46, 20, 1, 1, "/");
@@ -742,53 +742,53 @@ void Control_Enemy(int index) {
     Draw_Figure(x,y,objects[index]->size[0],objects[index]->size[1],figure_spider);
    }
    
-   //¾Æ¼ö¶óº¸½º : kind 401    (¿©±â¿¡ ½ºÅ³¿ë ¿ÀºêÁ§Æ® ÇÒ´çÇÏ¸é µÉµí)
+   //ì•„ìˆ˜ë¼ë³´ìŠ¤ : kind 401    (ì—¬ê¸°ì— ìŠ¤í‚¬ìš© ì˜¤ë¸Œì íŠ¸ í• ë‹¹í•˜ë©´ ë ë“¯)
     if(objects[index] -> kind == 401)
    {
    	
-    if (character.tick[3] == 0 && Check_Collision(objects[index]->position,character.position, objects[index]->size, character.size)) { //Ä³¸¯ÅÍÀÇ ÇÇ°İ½Ã ¹«Àû tick ==0 ÀÌ°í ¸ó½ºÅÍ¿Í Ãæµ¹ÀÌ ³ª¸é 
-         character.tick[3] = 100;   //Ä³¸¯ÅÍÀÇ ÇÇ°İ½Ã ¹«Àû tick = 100    (100¿¡¼­ 1¾¿ ÁÙ¾îµë. 0±îÁö ´Ù½Ã ÁÙ¾îµé¾î¾ß ´Ù½Ã ÇÇ°İÆÇÁ¤ °¡´É)
+    if (character.tick[3] == 0 && Check_Collision(objects[index]->position,character.position, objects[index]->size, character.size)) { //ìºë¦­í„°ì˜ í”¼ê²©ì‹œ ë¬´ì  tick ==0 ì´ê³  ëª¬ìŠ¤í„°ì™€ ì¶©ëŒì´ ë‚˜ë©´ 
+         character.tick[3] = 100;   //ìºë¦­í„°ì˜ í”¼ê²©ì‹œ ë¬´ì  tick = 100    (100ì—ì„œ 1ì”© ì¤„ì–´ë“¬. 0ê¹Œì§€ ë‹¤ì‹œ ì¤„ì–´ë“¤ì–´ì•¼ ë‹¤ì‹œ í”¼ê²©íŒì • ê°€ëŠ¥)
          character.hp[1] -= 50;
       	}
 	
     Draw_Figure(x,y,objects[index]->size[0],objects[index]->size[1],figure_asura);
    } 
    
-   //°Å¹Ì º¸½º ½ºÅ³
+   //ê±°ë¯¸ ë³´ìŠ¤ ìŠ¤í‚¬
    if (objects[index]->kind == 500) {
       
-      //½ºÅ³°ú Ä³¸¯ÅÍ Ãæµ¹½Ã 
-      if (character.tick[3] == 0 && Check_Collision(objects[index]->position,character.position, objects[index]->size, character.size)) { //Ä³¸¯ÅÍÀÇ ÇÇ°İ½Ã ¹«Àû tick ==0 ÀÌ°í ¸ó½ºÅÍ¿Í Ãæµ¹ÀÌ ³ª¸é 
-         character.tick[3] = 100;   //Ä³¸¯ÅÍÀÇ ÇÇ°İ½Ã ¹«Àû tick = 100    (100¿¡¼­ 1¾¿ ÁÙ¾îµë. 0±îÁö ´Ù½Ã ÁÙ¾îµé¾î¾ß ´Ù½Ã ÇÇ°İÆÇÁ¤ °¡´É)
+      //ìŠ¤í‚¬ê³¼ ìºë¦­í„° ì¶©ëŒì‹œ 
+      if (character.tick[3] == 0 && Check_Collision(objects[index]->position,character.position, objects[index]->size, character.size)) { //ìºë¦­í„°ì˜ í”¼ê²©ì‹œ ë¬´ì  tick ==0 ì´ê³  ëª¬ìŠ¤í„°ì™€ ì¶©ëŒì´ ë‚˜ë©´ 
+         character.tick[3] = 100;   //ìºë¦­í„°ì˜ í”¼ê²©ì‹œ ë¬´ì  tick = 100    (100ì—ì„œ 1ì”© ì¤„ì–´ë“¬. 0ê¹Œì§€ ë‹¤ì‹œ ì¤„ì–´ë“¤ì–´ì•¼ ë‹¤ì‹œ í”¼ê²©íŒì • ê°€ëŠ¥)
          character.hp[1] -= 15;
       }
-      //»õ³¢°Å¹Ì ¿òÁ÷ÀÓ ±¸Çö 
+      //ìƒˆë¼ê±°ë¯¸ ì›€ì§ì„ êµ¬í˜„ 
       if (objects[index]->tick[1] + objects[index]->tick[2] < tick) {
          objects[index]->tick[1] = tick;
-         objects[index]->tick[2] = 1000 + rand()%2000;   //if¹®ÀÌ 1ÃÊ+(0~2ÃÊ)¿¡ ÇÑ¹ø¾¿ ½ÇÇà. µû¶ó¼­ °¢ ½½¶óÀÓÀÌ 0~3ÃÊ¿¡ ÇÑ¹ø¾¿ ¿òÁ÷ÀÓ 
+         objects[index]->tick[2] = 1000 + rand()%2000;   //ifë¬¸ì´ 1ì´ˆ+(0~2ì´ˆ)ì— í•œë²ˆì”© ì‹¤í–‰. ë”°ë¼ì„œ ê° ìŠ¬ë¼ì„ì´ 0~3ì´ˆì— í•œë²ˆì”© ì›€ì§ì„ 
          
-         //»õ³¢°Å¹Ì y°¡¼Óµµ ¼³Á¤(Á¡ÇÁ) 
+         //ìƒˆë¼ê±°ë¯¸ yê°€ì†ë„ ì„¤ì •(ì í”„) 
          objects[index]->accel[1] = -2.5;
-         //»õ³¢°Å¹Ì x°¡¼Óµµ ¼³Á¤(xÃà ÀÌµ¿) 
+         //ìƒˆë¼ê±°ë¯¸ xê°€ì†ë„ ì„¤ì •(xì¶• ì´ë™) 
          if (Enemy_Position(x,  objects[index]->size[0]))
             objects[index]->accel[0] = 2;
          else
             objects[index]->accel[0] = -2;
       }
     Draw_Figure(x, y, objects[index]->size[0], objects[index]->size[1], figure_spider_skill);
-    Movement_Control(objects[index]->position, objects[index]->accel, objects[index]->size, &objects[index]->flyTime); //Áß·Â 
+    Movement_Control(objects[index]->position, objects[index]->accel, objects[index]->size, &objects[index]->flyTime); //ì¤‘ë ¥ 
    } 
    
-   //¾Æ¼ö¶ó º¸½º ½ºÅ³ 
+   //ì•„ìˆ˜ë¼ ë³´ìŠ¤ ìŠ¤í‚¬ 
    if (objects[index]->kind == 501) {
       
-      //½ºÅ³°ú Ä³¸¯ÅÍ Ãæµ¹½Ã 
-      if (character.tick[3] == 0 && Check_Collision(objects[index]->position,character.position, objects[index]->size, character.size)) { //Ä³¸¯ÅÍÀÇ ÇÇ°İ½Ã ¹«Àû tick ==0 ÀÌ°í ¸ó½ºÅÍ¿Í Ãæµ¹ÀÌ ³ª¸é 
-         character.tick[3] = 100;   //Ä³¸¯ÅÍÀÇ ÇÇ°İ½Ã ¹«Àû tick = 100    (100¿¡¼­ 1¾¿ ÁÙ¾îµë. 0±îÁö ´Ù½Ã ÁÙ¾îµé¾î¾ß ´Ù½Ã ÇÇ°İÆÇÁ¤ °¡´É)
+      //ìŠ¤í‚¬ê³¼ ìºë¦­í„° ì¶©ëŒì‹œ 
+      if (character.tick[3] == 0 && Check_Collision(objects[index]->position,character.position, objects[index]->size, character.size)) { //ìºë¦­í„°ì˜ í”¼ê²©ì‹œ ë¬´ì  tick ==0 ì´ê³  ëª¬ìŠ¤í„°ì™€ ì¶©ëŒì´ ë‚˜ë©´ 
+         character.tick[3] = 100;   //ìºë¦­í„°ì˜ í”¼ê²©ì‹œ ë¬´ì  tick = 100    (100ì—ì„œ 1ì”© ì¤„ì–´ë“¬. 0ê¹Œì§€ ë‹¤ì‹œ ì¤„ì–´ë“¤ì–´ì•¼ ë‹¤ì‹œ í”¼ê²©íŒì • ê°€ëŠ¥)
          character.hp[1] -= 20;
       }
     Draw_Figure(x, y, objects[index]->size[0], objects[index]->size[1], figure_sword);
-    Movement_Control(objects[index]->position, objects[index]->accel, objects[index]->size, &objects[index]->flyTime); //Áß·Â 
+    Movement_Control(objects[index]->position, objects[index]->accel, objects[index]->size, &objects[index]->flyTime); //ì¤‘ë ¥ 
    } 
 }
 
@@ -799,12 +799,12 @@ void Control_Particle(int index) {
    int number = rand() % 3;
    
    
-   //µ¿Àü 
+   //ë™ì „ 
    if (objects[index]->kind == 200) { 
       if (objects[index]->tick[1] < tick) {
-         objects[index]->tick[1] = tick * 2;      //if¹®ÀÌ °è¼Ó ½ÇÇàµÇ¸é °¡¼Óµµ°ªÀÌ °è¼Ó ÃÊ±âÈ­ µÇ¹Ç·Î µ¿ÀüÀÌ Á¡ÇÁ¸¦ ÇÏ°Ô?... µû¶ó¼­ ´Ù½Ã ½ÇÇà ¾ÈµÇµµ·Ï tick°ª ¼³Á¤ 
-         objects[index]->accel[0] =  number;   //µ¿Àü ¶ß´Â xÀ§Ä¡ Á¶±İ¾¿ ·£´ıÇÏ°Ô 
-         objects[index]->accel[1] =  -3;         //µ¿ÀüÀÌ À§·Î ¶¸´Ù°¡ ¶³¾îÁöµµ·Ï 
+         objects[index]->tick[1] = tick * 2;      //ifë¬¸ì´ ê³„ì† ì‹¤í–‰ë˜ë©´ ê°€ì†ë„ê°’ì´ ê³„ì† ì´ˆê¸°í™” ë˜ë¯€ë¡œ ë™ì „ì´ ì í”„ë¥¼ í•˜ê²Œ?... ë”°ë¼ì„œ ë‹¤ì‹œ ì‹¤í–‰ ì•ˆë˜ë„ë¡ tickê°’ ì„¤ì • 
+         objects[index]->accel[0] =  number;   //ë™ì „ ëœ¨ëŠ” xìœ„ì¹˜ ì¡°ê¸ˆì”© ëœë¤í•˜ê²Œ 
+         objects[index]->accel[1] =  -3;         //ë™ì „ì´ ìœ„ë¡œ ë–³ë‹¤ê°€ ë–¨ì–´ì§€ë„ë¡ 
       }
       
       if (Check_Collision(money_position, character.position, money_size, character.size)) {
@@ -816,24 +816,24 @@ void Control_Particle(int index) {
       
       Edit_Map(x, y - 1, '@');
    }
-   //µ¿Àü Áß·Â 
+   //ë™ì „ ì¤‘ë ¥ 
    Movement_Control(objects[index]->position, objects[index]->accel, objects[index]->size, &objects[index]->flyTime);
 }
 
-void Control_Object() {   //¸ğµç ¿ÀºêÁ§Æ® ÄÁÆ®·Ñ ÇÔ¼ö 
+void Control_Object() {   //ëª¨ë“  ì˜¤ë¸Œì íŠ¸ ì»¨íŠ¸ë¡¤ í•¨ìˆ˜ 
    for(int i = 0; i < OBJECT_MAX; i++) {
       if (objects[i]) {
-         if (objects[i]->kind < 100)   //0~99´Â ¾ÆÀÌÅÛ 
+         if (objects[i]->kind < 100)   //0~99ëŠ” ì•„ì´í…œ 
             Control_Item(i);
-         else if (objects[i]->kind == 200)   //200Àº µ¿Àü 
+         else if (objects[i]->kind == 200)   //200ì€ ë™ì „ 
             Control_Particle(i);
          else
-            Control_Enemy(i);      //³ª¸ÓÁö´Â Àû(½½¶óÀÓ,º¸½º,º¸½º½ºÅ³¿ÀºêÁ§Æ®)
+            Control_Enemy(i);      //ë‚˜ë¨¸ì§€ëŠ” ì (ìŠ¬ë¼ì„,ë³´ìŠ¤,ë³´ìŠ¤ìŠ¤í‚¬ì˜¤ë¸Œì íŠ¸)
       }
    }
 }
 
-void Remove_Object(int index) {      //object[index] ¸Ş¸ğ¸® ÇØÁ¦ ÈÄ NULL·Î ÃÊ±âÈ­ : ´Ù¸¥ ¿ÀºêÁ§Æ®¸¦ À§ÇÑ Å©±â ¸¸µé±â À§ÇÔ 
+void Remove_Object(int index) {      //object[index] ë©”ëª¨ë¦¬ í•´ì œ í›„ NULLë¡œ ì´ˆê¸°í™” : ë‹¤ë¥¸ ì˜¤ë¸Œì íŠ¸ë¥¼ ìœ„í•œ í¬ê¸° ë§Œë“¤ê¸° ìœ„í•¨ 
    free(objects[index]);
     objects[index] = 0;
 }
@@ -842,7 +842,7 @@ void textcolor(int foreground, int background) {
    int color=foreground+background*16; 
    SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), color); 
 }
-//ÀÎÆ®·ÎÈ­¸é ÇÔ¼öµé 
+//ì¸íŠ¸ë¡œí™”ë©´ í•¨ìˆ˜ë“¤ 
 void PrintLogo()
 {
 	printf("\n\n\n ");
@@ -903,7 +903,7 @@ void Intro()
 	Loading();
 	LoadEnd();
 }
-//¿£µùÅ©·¹µ÷¿ë ÇÔ¼öµé 
+//ì—”ë”©í¬ë ˆë”§ìš© í•¨ìˆ˜ë“¤ 
 void Goto(int x,int y)
 {
     COORD pos={x,y};
@@ -953,7 +953,7 @@ void EndingCredit()
 	PrintEnding2(7,28,6);
 	PrintEnding2(8,28,5);
 }
-//°ÔÀÓ¿À¹ö È­¸é
+//ê²Œì„ì˜¤ë²„ í™”ë©´
 void PrintGameover()
 {	
 	system("cls");
