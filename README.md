@@ -38,4 +38,6 @@ C 콘솔 기반 2D 횡 스크롤 게임
 | :------------ | :----------: |
 | Project finishing and presentation | &#9745; |
 
-###### :question: For more information about our game, please contact seokregi@gmail.com
+
+#### 플레이 영상
+https://user-images.githubusercontent.com/64322765/116147960-4e077800-a71b-11eb-8fb8-99aba38e817a.mp4
